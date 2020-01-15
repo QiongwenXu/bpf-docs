@@ -160,8 +160,8 @@ Opcode | Mnemonic              | Pseudocode
 
 ## Branch Instructions
 
-op (L32)dst, imm32, +off16  
-op dst, src, +off16
+opcode dst, imm32, +off16  
+opcode dst, src, +off16
 
 Opcode | Mnemonic            | Pseudocode
 -------|---------------------|------------------------
