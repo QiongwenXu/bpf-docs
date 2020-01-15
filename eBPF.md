@@ -72,10 +72,10 @@ Opcode | Mnemonic      | Pseudocode
 0x4f   | or dst, src   | dst \|= src
 0x57   | and dst, imm  | dst &= imm
 0x5f   | and dst, src  | dst &= src
-0x67   | lsh dst, imm  | dst <<= imm
-0x6f   | lsh dst, src  | dst <<= src
-0x77   | rsh dst, imm  | dst >>= imm (logical)
-0x7f   | rsh dst, src  | dst >>= src (logical)
+0x67   | lsh dst, imm  | dst <<= imm (0<=imm<=63)
+0x6f   | lsh dst, src  | dst <<= L6(src)
+0x77   | rsh dst, imm  | dst >>= imm (logical, 0<=imm<=63)
+0x7f   | rsh dst, src  | dst >>= L6(src) (logical)
 0x87   | neg dst       | dst = -dst
 0x97   | mod dst, imm  | dst %= imm
 0x9f   | mod dst, src  | dst %= src
@@ -83,13 +83,15 @@ Opcode | Mnemonic      | Pseudocode
 0xaf   | xor dst, src  | dst ^= src
 0xb7   | mov dst, imm  | dst = imm
 0xbf   | mov dst, src  | dst = src
-0xc7   | arsh dst, imm | dst >>= imm (arithmetic)
-0xcf   | arsh dst, src | dst >>= src (arithmetic)
+0xc7   | arsh dst, imm | dst >>= imm (arithmetic, 0<=imm<=63)
+0xcf   | arsh dst, src | dst >>= L6(src) (arithmetic)
 
 ### 32-bit
 
 These instructions use only the lower 32 bits of their operands and zero the
 upper 32 bits of the destination register.
+
+Generally: (int32_t)dst op imm32 / (int32_t)src. For `sh`, imm32 should be in [0, 31]; src only is used lower 5 bits, i.e., L5(src)
 
 Opcode | Mnemonic        | Pseudocode
 -------|-----------------|------------------------------
@@ -105,10 +107,10 @@ Opcode | Mnemonic        | Pseudocode
 0x4c   | or32 dst, src   | dst \|= src
 0x54   | and32 dst, imm  | dst &= imm
 0x5c   | and32 dst, src  | dst &= src
-0x64   | lsh32 dst, imm  | dst <<= imm
-0x6c   | lsh32 dst, src  | dst <<= src
-0x74   | rsh32 dst, imm  | dst >>= imm (logical)
-0x7c   | rsh32 dst, src  | dst >>= src (logical)
+0x64   | lsh32 dst, imm  | dst <<= imm (0 <= imm <=31)
+0x6c   | lsh32 dst, src  | dst <<= L5(src)
+0x74   | rsh32 dst, imm  | dst >>= imm (logical, 0 <= imm <=31)
+0x7c   | rsh32 dst, src  | dst >>= L5(src) (logical)
 0x84   | neg32 dst       | dst = -dst
 0x94   | mod32 dst, imm  | dst %= imm
 0x9c   | mod32 dst, src  | dst %= src
@@ -117,7 +119,7 @@ Opcode | Mnemonic        | Pseudocode
 0xb4   | mov32 dst, imm  | dst = imm
 0xbc   | mov32 dst, src  | dst = src
 0xc4   | arsh32 dst, imm | dst >>= imm (arithmetic)
-0xcc   | arsh32 dst, src | dst >>= src (arithmetic)
+0xcc   | arsh32 dst, src | dst >>= L5(src) (arithmetic)
 
 ### Byteswap instructions
 
@@ -157,6 +159,9 @@ Opcode | Mnemonic              | Pseudocode
 0x7b   | stxdw [dst+off], src  | *(uint64_t *) (dst + off) = src
 
 ## Branch Instructions
+
+op (L32)dst, imm32, +off16  
+op dst, src, +off16
 
 Opcode | Mnemonic            | Pseudocode
 -------|---------------------|------------------------
